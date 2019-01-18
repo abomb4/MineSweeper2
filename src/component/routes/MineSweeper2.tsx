@@ -1,4 +1,5 @@
 import * as React from 'react';
+import Input from '../ui/Input';
 
 /**
  * Defines all game status
@@ -14,15 +15,11 @@ export enum EnumGameStatus {
   GAME_OVER_SUCCEED
 }
 
-interface Coordination {
-  x: number;
-  y: number;
-}
-
 /**
- * The props for MineSweeper component, defines the game states.
+ * Mine sweeper game settings
  */
-export interface Props {
+interface Settings {
+
   /** The size of mine area, contains width and height */
   mineAreaSize: {
     width: number,
@@ -30,7 +27,72 @@ export interface Props {
   };
 
   /** Total mines in that area, cannot greeter than mineAreaSize.width * mineAreaSize.height */
-  totalMines: number;
+  mineCount: number;
+}
+
+interface Coordination {
+  x: number;
+  y: number;
+}
+
+interface MainMenuProps {
+
+  /** Settings of this game */
+  gameSettings: Settings;
+
+  onAreaWidthChanged: (value: number) => any;
+  onAreaHeightChanged: (value: number) => any;
+  onMineCountChanged: (value: number) => any;
+  onGameStart: () => any;
+}
+
+class MainMenu extends React.Component<MainMenuProps> {
+
+  onAreaWidthChanged(event: React.ChangeEvent<HTMLInputElement>) {
+    if (event.target.value || '' !== event.target.value) {
+      this.props.onAreaHeightChanged(Number.parseInt(event.target.value));
+    }
+  }
+  onAreaHeightChanged(event: React.ChangeEvent<HTMLInputElement>) {
+    if (event.target.value || '' !== event.target.value) {
+      this.props.onAreaHeightChanged(Number.parseInt(event.target.value));
+    }
+  }
+  onMineCountChanged(event: React.ChangeEvent<HTMLInputElement>) {
+    if (event.target.value || '' !== event.target.value) {
+      this.props.onMineCountChanged(Number.parseInt(event.target.value));
+    }
+  }
+
+  public render() {
+    const props = this.props;
+
+    return (
+      <div className="ms-main-menu">
+        <div className="ms-main-menu-item area-width">
+          <Input label="Area width" inputProps={{ type: 'number', value: props.gameSettings.mineAreaSize.width, onChange: this.onAreaWidthChanged }} />
+        </div>
+        <div className="ms-main-menu-item area-height">
+          <Input label="Area height" inputProps={{ type: 'number', value: props.gameSettings.mineAreaSize.height, onChange: this.onAreaHeightChanged }} />
+        </div>
+        <div className="ms-main-menu-item mine-count">
+          <Input label="Mine count" inputProps={{ type: 'number', value: props.gameSettings.mineCount, onChange: this.onMineCountChanged }} />
+        </div>
+        <div className="ms-main-menu-item start">
+          <button onClick={props.onGameStart}>Start</button>
+        </div>
+      </div>
+    );
+  }
+}
+
+/**
+ * The props for MineSweeper component, defines the game states.
+ */
+export interface Props {
+
+  /** Settings of this game */
+  gameSettings: Settings;
 
   /** Total flags pointeed in this game */
   totalFlags: number;
@@ -44,11 +106,19 @@ export interface Props {
   /** Current mine area info */
   mineArea: number[][];
 
-  /** On area clicked */
-  onAreaClicked(point: Coordination): any;
+  // Events on main menu
+  onAreaWidthChanged: (value: number) => any;
+  onAreaHeightChanged: (value: number) => any;
+  onMineCountChanged: (value: number) => any;
+  onGameStart: () => any;
 
-  /** On area right clicked */
+  // Events during game
+  onAreaClicked(point: Coordination): any;
   onAreaRightClicked(point: Coordination): any;
+
+  // Events on game over
+  onRestartImmediately: () => any;
+  onReturn: () => any;
 }
 
 /**
@@ -68,30 +138,44 @@ export default class MineSweeper2 extends React.Component<Props> {
   public render() {
     const props = this.props;
 
-    const p: JSX.Element = (() => {
-      let e: JSX.Element;
-      switch (props.gameStatus) {
-        case EnumGameStatus.MAIN_MENU:
-          e = this.renderMainMenu(props);
-          break;
-
-        case EnumGameStatus.STARTED:
-          e = this.renderGameStarted(props);
-          break;
-
-        case EnumGameStatus.GAME_OVER_SUCCEED:
-        case EnumGameStatus.GAME_OVER_FAILED:
-          e = this.renderGameOver(props);
-          break;
-        default:
-          throw 'Invalid props of MineSweeper2';
-      }
-      return e;
-    })();
-
     return (
-      <div className="minesweeper-game">{p}</div>
+      <div className="minesweeper-game">
+        <div className="ms-logo-container">
+          <div className="ms-logo">
+            aijodioafsdaf
+          </div>
+        </div>
+        <div className="ms-body">
+          {this.renderPage(props)}
+        </div>
+      </div>
     );
+  }
+
+  /**
+   * Detect what main component should render
+   *
+   * @param props Props
+   */
+  private renderPage(props: Props): JSX.Element {
+    let e: JSX.Element;
+    switch (props.gameStatus) {
+      case EnumGameStatus.MAIN_MENU:
+        e = this.renderMainMenu(props);
+        break;
+
+      case EnumGameStatus.STARTED:
+        e = this.renderGameStarted(props);
+        break;
+
+      case EnumGameStatus.GAME_OVER_SUCCEED:
+      case EnumGameStatus.GAME_OVER_FAILED:
+        e = this.renderGameOver(props);
+        break;
+      default:
+        throw 'Invalid props of MineSweeper2';
+    }
+    return e;
   }
 
   /**
@@ -99,8 +183,16 @@ export default class MineSweeper2 extends React.Component<Props> {
    *
    * @param props Props
    */
-  renderMainMenu(props: Props): JSX.Element {
-    return (<div />);
+  private renderMainMenu(props: Props): JSX.Element {
+    return (
+      <MainMenu
+        gameSettings={props.gameSettings}
+        onAreaWidthChanged={props.onAreaWidthChanged}
+        onAreaHeightChanged={props.onAreaHeightChanged}
+        onMineCountChanged={props.onMineCountChanged}
+        onGameStart={props.onGameStart}
+      />
+    );
   }
 
   /**
@@ -108,7 +200,7 @@ export default class MineSweeper2 extends React.Component<Props> {
    *
    * @param props Props
    */
-  renderGameStarted(props: Props): JSX.Element {
+  private renderGameStarted(props: Props): JSX.Element {
     return (<div />);
   }
 
@@ -117,7 +209,7 @@ export default class MineSweeper2 extends React.Component<Props> {
    *
    * @param props Props
    */
-  renderGameOver(props: Props): JSX.Element {
+  private renderGameOver(props: Props): JSX.Element {
     return (<div />);
   }
 }
