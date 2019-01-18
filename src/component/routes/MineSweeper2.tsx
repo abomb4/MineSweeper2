@@ -161,7 +161,13 @@ export default class MineSweeper2 extends React.Component<Props> {
     let e: JSX.Element;
     switch (props.gameStatus) {
       case EnumGameStatus.MAIN_MENU:
-        e = this.renderMainMenu(props);
+        e = (<MainMenu
+            gameSettings={props.gameSettings}
+            onAreaWidthChanged={props.onAreaWidthChanged}
+            onAreaHeightChanged={props.onAreaHeightChanged}
+            onMineCountChanged={props.onMineCountChanged}
+            onGameStart={props.onGameStart}
+        />);
         break;
 
       case EnumGameStatus.STARTED:
@@ -179,29 +185,30 @@ export default class MineSweeper2 extends React.Component<Props> {
   }
 
   /**
-   * Render the Main menu component
-   *
-   * @param props Props
-   */
-  private renderMainMenu(props: Props): JSX.Element {
-    return (
-      <MainMenu
-        gameSettings={props.gameSettings}
-        onAreaWidthChanged={props.onAreaWidthChanged}
-        onAreaHeightChanged={props.onAreaHeightChanged}
-        onMineCountChanged={props.onMineCountChanged}
-        onGameStart={props.onGameStart}
-      />
-    );
-  }
-
-  /**
    * Render the Game started component
    *
    * @param props Props
    */
   private renderGameStarted(props: Props): JSX.Element {
-    return (<div />);
+    return (
+      <div className="ms-game-started">
+        <div className="ms-game-state">
+          <div className="ms-mine-remaining">
+            <Input labeled={true} label="剩余地雷" />
+          </div>
+          <div className="ms-duration">
+            <Input labeled={true} label="开始时间" />
+          </div>
+        </div>
+        <div className="ms-game-area">
+          <div className="ms-area-row">
+            <div className="ms-area-column">
+              <div className="ms-mine">X</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   /**
