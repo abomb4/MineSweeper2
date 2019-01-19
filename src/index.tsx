@@ -32,7 +32,7 @@ const store = createStore(
 ReactDOM.render(
   <Provider store={store}>
     <ConnectedRouter history={history}>
-      <FontSizeProvider updateRem={true} delay={1000} baseWidth={1280}>
+      <FontSizeProvider updateRem={true} delay={1000} baseWidth={1280} minWidth={1280}>
         <Router>
           <Route path="/" component={App} />
         </Router>

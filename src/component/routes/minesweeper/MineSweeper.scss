@@ -1,0 +1,85 @@
+@import '../../../styles/ui-common.scss';
+
+.minesweeper-game {
+  border: 0.0625rem solid #e0e0e0;
+  border-radius: 0.5rem;
+  width: 52rem;
+  padding: 1rem 1rem 3rem 1rem;
+  margin: auto;
+  background-color: #fff;
+
+  .ms-logo-container {
+    border-bottom: 0.0625rem solid #eee;
+    font-size: 2rem;
+    height: 4rem;
+    vertical-align: middle;
+
+    &:after {
+      content: '';
+      display: inline-block;
+      width: 0px;
+      height: 100%;
+      vertical-align: middle;
+    }
+
+    >* {
+      display: inline-block;
+      vertical-align: middle;
+    }
+  }
+
+  // Non-logo part
+  .ms-body {
+    margin-top: 2rem;
+
+    .ms-main-menu-item {
+      margin-bottom: 0.75rem;
+
+      .ui-input label {
+        width: 8rem;
+      }
+    }
+
+    .ms-game-area {
+      display: flex;
+      flex-direction: column;
+      width: 70%;
+      background-color: $base_background_deep_color;
+      border: $base_border;
+      margin: auto;
+
+      .ms-area-row {
+        display: flex;
+        flex: 1;
+        flex-direction: row;
+
+        .ms-area-column {
+          flex: 1 0 auto;
+          margin: 0.125rem;
+          overflow: hidden;
+          position: relative;
+          border: $base_border;
+          border-radius: $base_border_radius;
+
+          &:after {
+            content: "";
+            display: block;
+            padding-top: 100%;
+          }
+
+          .ms-area {
+            position: absolute;
+            cursor: pointer;
+            top:0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            display: inline-block;
+          }
+        }
+      }
+
+    }
+  }
+
+}
