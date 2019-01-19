@@ -31,11 +31,14 @@ const defaultFontBaseWidth = 1920;
  * 当宽度为 baseWidth 时，认为字体倍率为1（16px为基准）
  *
  * @param baseWidth 宽度基准，当屏幕宽度为此数字时认为字体为16px
+ * @param minWidth  当屏幕宽度小于此值时，按此值计算；为 undefined 时按0处理
  */
-export function getRelativeFontScale(baseWidth: number) {
+export function getRelativeFontScale(baseWidth: number, minWidth?: number) {
   const html = document.querySelector('html');
   if (html) {
-    const width = html.getBoundingClientRect().width;
+    const htmlWidth = html.getBoundingClientRect().width;
+    const width = minWidth && minWidth > 0 && htmlWidth < minWidth
+                  ? minWidth : htmlWidth;
     return width / baseWidth;
   } else {
     return 1;
@@ -46,9 +49,10 @@ export function getRelativeFontScale(baseWidth: number) {
  * 基于屏幕宽度的放大比率计算方法
  *
  * @param baseWidth 宽度基准，当屏幕宽度为此数字时认为字体为 1 倍
+ * @param minWidth  当屏幕宽度小于此值时，按此值计算；为 undefined 时按0处理
  */
-export function getRelativeFontSize(baseWidth: number) {
-  return 16 * getRelativeFontScale(baseWidth);
+export function getRelativeFontSize(baseWidth: number, minWidth?: number) {
+  return 16 * getRelativeFontScale(baseWidth, minWidth);
 }
 
 interface IState {
@@ -61,6 +65,8 @@ interface IProps {
   updateRem?: boolean;
   /** 屏幕目标宽度，当屏幕宽度为该数字时为1倍缩放16px字体 */
   baseWidth?: number;
+  /** 最小宽度 */
+  minWidth?: number;
   children?: JSX.Element | JSX.Element[];
 }
 
@@ -113,9 +119,10 @@ export default class FontSizeProvider extends React.Component<IProps, IState> {
    */
   private windowResized() {
     const baseWidth = this.props.baseWidth ? this.props.baseWidth : defaultFontBaseWidth;
+    const minWidth = this.props.minWidth;
     const newFontSize = {
-      fontScale: getRelativeFontScale(baseWidth),
-      fontSize: getRelativeFontSize(baseWidth),
+      fontScale: getRelativeFontScale(baseWidth, minWidth),
+      fontSize: getRelativeFontSize(baseWidth, minWidth),
     };
 
     if (this.state.fontSize.fontSize !== newFontSize.fontSize
@@ -130,8 +137,9 @@ export default class FontSizeProvider extends React.Component<IProps, IState> {
    */
   private updateRemIfNeed() {
     const baseWidth = this.props.baseWidth ? this.props.baseWidth : defaultFontBaseWidth;
+    const minWidth = this.props.minWidth;
     if (this.props.updateRem) {
-      document.getElementsByTagName('html')[0].style.fontSize = getRelativeFontSize(baseWidth) + 'px';
+      document.getElementsByTagName('html')[0].style.fontSize = getRelativeFontSize(baseWidth, minWidth) + 'px';
     }
   }
 }
