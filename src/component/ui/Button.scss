@@ -1,0 +1,73 @@
+@import '../../styles/ui-common.scss';
+
+.ui-button {
+
+  color: $base_foreground_dark_color;
+  background-color: $base_background_color;
+  border-radius: $base_border_radius;
+  line-height: $base_line_height;
+  height: $base_height;
+  padding: 0 1rem 0 1rem;
+  border: $base_border;
+
+  &:hover {
+    border-color: $base_highlight_color;
+    color: $base_highlight_color;
+  }
+
+  &:active {
+    border-color: $base_highlight_deep_color;
+    color: $base_highlight_deep_color;
+  }
+
+  // Primary style
+  &.primary {
+    color: $base_foreground_light_color;
+    background-color: $base_highlight_color;
+    border-color: $base_highlight_color;
+
+    &:hover {
+      border-color: $base_highlight_light_color;
+      background-color: $base_highlight_light_color;
+    }
+
+    &:active {
+      border-color: $base_highlight_deep_color;
+      background-color: $base_highlight_deep_color;
+    }
+  }
+
+  // Warning style
+  &.warning {
+    color: $base_foreground_light_color;
+    background-color: $base_warning_color;
+    border-color: $base_warning_color;
+
+    &:hover {
+      border-color: $base_warning_light_color;
+      background-color: $base_warning_light_color;
+    }
+
+    &:active {
+      border-color: $base_warning_deep_color;
+      background-color: $base_warning_deep_color;
+    }
+  }
+
+  // Danger style
+  &.danger {
+    color: $base_foreground_light_color;
+    background-color: $base_error_color;
+    border-color: $base_error_color;
+
+    &:hover {
+      border-color: $base_error_light_color;
+      background-color: $base_error_light_color;
+    }
+
+    &:active {
+      border-color: $base_error_deep_color;
+      background-color: $base_error_deep_color;
+    }
+  }
+}

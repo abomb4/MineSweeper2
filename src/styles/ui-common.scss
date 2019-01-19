@@ -1,0 +1,43 @@
+
+// Colors
+$base_foreground_light_color: #fafaff;
+$base_foreground_dark_color: #30303a;
+
+$base_grey_light_color: #bdbdbd;
+$base_grey_color: #a0a0a0;
+$base_grey_deep_color: #535353;
+
+$base_background_light_color: #ffffff;
+$base_background_color: #fafaff;
+$base_background_deep_color: #eeeeef;
+
+$base_highlight_light_color: #31baff;
+$base_highlight_color: #0f93ff;
+$base_highlight_deep_color: #0059ff;
+
+$base_warning_light_color: #ffdb0f;
+$base_warning_color: #ffbb00;
+$base_warning_deep_color: #ffa000;
+
+$base_error_light_color: #ff7575;
+$base_error_color: #ff1111;
+$base_error_deep_color: #c50000;
+
+
+$base_border_color: $base_grey_light_color;
+$base_disable_color: #e0e0e5;
+
+// Element common
+$base_height: 2.5rem;
+$base_line_height: 2rem;
+$base_font_size: 1rem;
+
+// Shadow
+$base_shadow: 0.125rem 0.125rem 0.25rem 0.0625rem;
+
+// Borders
+$base_border_width: 0.0625rem;
+$base_border_radius: 0.25rem;
+$base_border: $base_border_width solid $base_border_color;
+
+// button

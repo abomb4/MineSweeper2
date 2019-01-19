@@ -1,0 +1,29 @@
+@import '../../styles/ui-common.scss';
+
+.ui-input {
+
+  height: $base_height;
+
+  >label {
+    display: inline-block;
+    text-align: right;
+    line-height: $base_line_height;
+  }
+
+  >input {
+    display: inline-block;
+    margin-left: 0.5rem;
+    line-height: $base_line_height;
+    border-radius: $base_border_radius;
+    border: $base_border;
+    text-indent: 0.5625rem;
+
+    &:hover {
+      border-color: $base_highlight_color;
+    }
+    &:focus {
+      border-color: $base_highlight_deep_color;
+      // box-shadow: $base_shadow $base_highlight_color;
+    }
+  }
+}

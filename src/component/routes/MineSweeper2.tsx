@@ -1,5 +1,7 @@
 import * as React from 'react';
 import Input from '../ui/Input';
+import './MineSweeper2.scss';
+import Button from '../ui/Button';
 
 /**
  * Defines all game status
@@ -48,17 +50,24 @@ interface MainMenuProps {
 
 class MainMenu extends React.Component<MainMenuProps> {
 
-  onAreaWidthChanged(event: React.ChangeEvent<HTMLInputElement>) {
+  constructor(props: MainMenuProps) {
+    super(props);
+    this.onAreaWidthChanged.bind(this);
+    this.onAreaHeightChanged.bind(this);
+    this.onMineCountChanged.bind(this);
+  }
+
+  onAreaWidthChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.value || '' !== event.target.value) {
+      this.props.onAreaWidthChanged(Number.parseInt(event.target.value));
+    }
+  }
+  onAreaHeightChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.value || '' !== event.target.value) {
       this.props.onAreaHeightChanged(Number.parseInt(event.target.value));
     }
   }
-  onAreaHeightChanged(event: React.ChangeEvent<HTMLInputElement>) {
-    if (event.target.value || '' !== event.target.value) {
-      this.props.onAreaHeightChanged(Number.parseInt(event.target.value));
-    }
-  }
-  onMineCountChanged(event: React.ChangeEvent<HTMLInputElement>) {
+  onMineCountChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.value || '' !== event.target.value) {
       this.props.onMineCountChanged(Number.parseInt(event.target.value));
     }
@@ -79,7 +88,7 @@ class MainMenu extends React.Component<MainMenuProps> {
           <Input label="Mine count" inputProps={{ type: 'number', value: props.gameSettings.mineCount, onChange: this.onMineCountChanged }} />
         </div>
         <div className="ms-main-menu-item start">
-          <button onClick={props.onGameStart}>Start</button>
+          <Button type="warning" onClick={props.onGameStart}>Start</Button>
         </div>
       </div>
     );
@@ -95,16 +104,16 @@ export interface Props {
   gameSettings: Settings;
 
   /** Total flags pointeed in this game */
-  totalFlags: number;
+  totalFlags?: number;
 
   /** Start time of this game */
-  gameStartTime: Date;
+  gameStartTime?: Date;
 
   /** Current status of this game */
   gameStatus: EnumGameStatus;
 
   /** Current mine area info */
-  mineArea: number[][];
+  mineArea?: number[][];
 
   // Events on main menu
   onAreaWidthChanged: (value: number) => any;
@@ -142,8 +151,8 @@ export default class MineSweeper2 extends React.Component<Props> {
       <div className="minesweeper-game">
         <div className="ms-logo-container">
           <div className="ms-logo">
-            aijodioafsdaf
           </div>
+          <span>Mine Sweeper Game</span>
         </div>
         <div className="ms-body">
           {this.renderPage(props)}
@@ -217,6 +226,10 @@ export default class MineSweeper2 extends React.Component<Props> {
    * @param props Props
    */
   private renderGameOver(props: Props): JSX.Element {
-    return (<div />);
+    return (
+      <div className="ms-game-over">
+        Game over.
+      </div>
+    );
   }
 }
