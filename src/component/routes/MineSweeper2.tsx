@@ -88,7 +88,7 @@ class MainMenu extends React.Component<MainMenuProps> {
           <Input label="Mine count" inputProps={{ type: 'number', value: props.gameSettings.mineCount, onChange: this.onMineCountChanged }} />
         </div>
         <div className="ms-main-menu-item start">
-          <Button type="warning" onClick={props.onGameStart}>Start</Button>
+          <Button type="primary" onClick={props.onGameStart}>Start</Button>
         </div>
       </div>
     );
