@@ -8,8 +8,9 @@
   margin: auto;
   background-color: #fff;
 
+  // Logo part
   .ms-logo-container {
-    border-bottom: 0.0625rem solid #eee;
+    border-bottom: 0.0625rem solid $base_grey_light_color;
     font-size: 2rem;
     height: 4rem;
     vertical-align: middle;
@@ -22,7 +23,7 @@
       vertical-align: middle;
     }
 
-    >* {
+    > * {
       display: inline-block;
       vertical-align: middle;
     }
@@ -30,8 +31,12 @@
 
   // Non-logo part
   .ms-body {
-    margin-top: 2rem;
 
+    > * {
+      margin-top: 2rem;
+    }
+
+    // In main menu
     .ms-main-menu-item {
       margin-bottom: 0.75rem;
 
@@ -40,46 +45,68 @@
       }
     }
 
-    .ms-game-area {
-      display: flex;
-      flex-direction: column;
-      width: 70%;
-      background-color: $base_background_deep_color;
-      border: $base_border;
-      margin: auto;
+    // In game started
+    .ms-game-started {
+      .ms-game-state {
+        margin-bottom: 1rem;
+      }
 
-      .ms-area-row {
+      .ms-game-area {
+        margin-top: 2rem;
         display: flex;
-        flex: 1;
-        flex-direction: row;
+        flex-direction: column;
+        width: 55%;
+        background-color: $base_background_deep_color;
+        border: $base_border;
+        margin: auto;
 
-        .ms-area-column {
-          flex: 1 0 auto;
-          margin: 0.125rem;
-          overflow: hidden;
-          position: relative;
-          border: $base_border;
-          border-radius: $base_border_radius;
+        .ms-area-row {
+          display: flex;
+          flex: 1;
+          flex-direction: row;
 
-          &:after {
-            content: "";
-            display: block;
-            padding-top: 100%;
-          }
+          .ms-area-column {
+            flex: 1 0 auto;
+            margin: 0.125rem;
+            overflow: hidden;
+            position: relative;
 
-          .ms-area {
-            position: absolute;
-            cursor: pointer;
-            top:0;
-            left: 0;
-            bottom: 0;
-            right: 0;
-            display: inline-block;
+            &:after {
+              content: "";
+              display: block;
+              padding-top: 100%;
+            }
+
+            .ms-area {
+              position: absolute;
+              cursor: pointer;
+              top:0;
+              left: 0;
+              bottom: 0;
+              right: 0;
+              display: inline-block;
+              border: 0.0625rem outset $base_grey_light_color;
+              border-style: outset;
+
+              &:hover {
+                background-color: rgba($base_background_light_color, .9);
+              }
+
+              &:active {
+                border-style: inset;
+              }
+              &.opened {
+                border-style: inset;
+                background-color: $base_background_light_color;
+              }
+            }
           }
         }
       }
-
     }
+
+    // Game over
+
   }
 
 }

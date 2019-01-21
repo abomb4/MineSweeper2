@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { Settings } from './common';
-import Input from '../../ui/Input';
 import Button from '../../ui/Button';
+import Input from '../../ui/Input';
+import { Settings } from './common';
 
 interface MainMenuProps {
 
@@ -23,19 +23,19 @@ export default class MainMenu extends React.Component<MainMenuProps> {
     this.onMineCountChanged.bind(this);
   }
 
-  onAreaWidthChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
+  public onAreaWidthChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.value || '' !== event.target.value) {
-      this.props.onAreaWidthChanged(Number.parseInt(event.target.value));
+      this.props.onAreaWidthChanged(Number.parseInt(event.target.value, 10));
     }
   }
-  onAreaHeightChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
+  public onAreaHeightChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.value || '' !== event.target.value) {
-      this.props.onAreaHeightChanged(Number.parseInt(event.target.value));
+      this.props.onAreaHeightChanged(Number.parseInt(event.target.value, 10));
     }
   }
-  onMineCountChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
+  public onMineCountChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.value || '' !== event.target.value) {
-      this.props.onMineCountChanged(Number.parseInt(event.target.value));
+      this.props.onMineCountChanged(Number.parseInt(event.target.value, 10));
     }
   }
 

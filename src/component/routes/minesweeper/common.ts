@@ -47,5 +47,6 @@ export enum EnumAreaState {
 
 export interface Area {
   isBomb: boolean;
+  surrounding: number;
   state: EnumAreaState;
 }

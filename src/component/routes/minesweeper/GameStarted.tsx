@@ -1,8 +1,37 @@
 import classnames from 'classnames';
 import * as React from 'react';
-import Button from '../../ui/Button';
 import Input from '../../ui/Input';
-import { Area, EnumAreaState, Settings } from './common';
+import { Area, Coordination, EnumAreaState, Settings } from './common';
+
+interface AreaProps {
+  rowIndex: number;
+  columnIndex: number;
+  areaData: Area;
+  onAreaClicked: (point: Coordination) => any;
+}
+
+class AreaComponent extends React.Component<AreaProps> {
+
+  public render() {
+    const data = this.props.areaData;
+    const cls = classnames('ms-area', {
+      'is-bomb': data.isBomb,
+      'opened': EnumAreaState.OPEN === data.state,
+      'flagged': EnumAreaState.FLAGGED === data.state,
+      'tagged': EnumAreaState.TAGGED === data.state,
+      'not-opened': EnumAreaState.NOT_OPEN === data.state,
+    });
+    return (
+    <span className={cls} onClick={this.handleClick}>
+      { !data.isBomb && data.state === EnumAreaState.OPEN && data.surrounding > 0 ? data.surrounding : undefined }
+    </span>
+    );
+  }
+
+  private handleClick = () => {
+    this.props.onAreaClicked({ x: this.props.columnIndex + 1, y: this.props.rowIndex + 1 });
+  }
+}
 
 interface GameStartedProps {
 
@@ -12,6 +41,7 @@ interface GameStartedProps {
   /** Current mine area info */
   mineArea?: Area[][];
 
+  onAreaClicked: (point: Coordination) => any;
   onAreaWidthChanged: (value: number) => any;
   onAreaHeightChanged: (value: number) => any;
   onMineCountChanged: (value: number) => any;
@@ -48,7 +78,9 @@ export default class GameStarted extends React.Component<GameStartedProps> {
           {
             mineArea.map((rowArray, rowIndex) => {
               const columns = rowArray.map((area, columnIndex) => (
-                <div className="ms-area-column" key={`ms_area_row_${rowIndex}_col_${columnIndex}`}>{this.resolveAreaData(area)}</div>
+                <div className="ms-area-column" key={`ms_area_row_${rowIndex}_col_${columnIndex}`}>
+                  {<AreaComponent areaData={area} rowIndex={rowIndex} columnIndex={columnIndex} onAreaClicked={this.props.onAreaClicked} />}
+                </div>
               ));
               return (<div className="ms-area-row" key={'ms_area_row_' + rowIndex}>{columns}</div>);
             })
@@ -72,16 +104,5 @@ export default class GameStarted extends React.Component<GameStartedProps> {
     if (event.target.value || '' !== event.target.value) {
       this.props.onMineCountChanged(Number.parseInt(event.target.value, 10));
     }
-  }
-
-  private resolveAreaData: (data: Area) => JSX.Element = (data: Area) => {
-    const cls = classnames('ms-area', {
-      'is-bomb': data.isBomb,
-      'opened': EnumAreaState.OPEN === data.state,
-      'flagged': EnumAreaState.FLAGGED === data.state,
-      'tagged': EnumAreaState.TAGGED === data.state,
-      'not-opened': EnumAreaState.NOT_OPEN === data.state,
-    });
-    return (<span className={cls}/>);
   }
 }

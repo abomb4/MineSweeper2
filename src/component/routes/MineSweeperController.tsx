@@ -4,6 +4,8 @@ import { settings } from 'cluster';
 import { Area, Coordination, EnumAreaState, Settings } from './minesweeper/common';
 import { EnumGameStatus } from './minesweeper/common';
 import MineSweeper from './minesweeper/MineSweeper';
+import { safeGet, safeDoubleGet } from '../../utils/array';
+import { Optional, empty, of } from '../../utils/optional';
 
 interface State {
 
@@ -133,38 +135,70 @@ export default class MineSweeperController extends React.Component<any, State> {
 
   // Events during game
   private onAreaClicked: (point: Coordination) => any = (point: Coordination) => {
-    const { x, y } = point;
-    if (x <= 0 || x >= this.state.gameSettings.mineAreaSize.width) {
-      console.log(`Coordinate ${point} x is invalid`);
+    if (!this.checkPointValid(point)) {
       return;
     }
-    if (y <= 0 || y >= this.state.gameSettings.mineAreaSize.height) {
-      console.log(`Coordinate ${point} y is invalid`);
-      return;
+    let areaArray: Area[][] = Object.assign([], this.state.mineArea);
+
+    // If flagged or opened, do nothing
+    switch (this.getArea(areaArray, point).state) {
+      case EnumAreaState.FLAGGED:
+      case EnumAreaState.OPEN:
+        return;
+      default: break;
     }
-    if (this.state.areaInited) {
-    } else {
-      const areaArray = this.createFilledMineAreaArray(this.state, point);
-      areaArray[point.y - 1][point.x - 1].state = EnumAreaState.OPEN;
+
+    // Init first
+    if (!this.state.areaInited) {
+      areaArray = this.createFilledMineAreaArray(this.state, point);
+      this.getArea(areaArray, point).state = EnumAreaState.OPEN;
       this.setState({
         areaInited: true,
         mineArea: areaArray
       });
     }
+
+    // Active
+
   }
 
   private onAreaRightClicked: (point: Coordination) => any = (point: Coordination) => {
+    if (!this.checkPointValid(point)) {
+      return;
+    }
+    const { x, y } = point;
   }
 
   // =-=-=-=-=-=-=-=-=-=-=- Functions -=-=-=-=-=-=-=-=-=-=-=-=
+  private checkPointValid(point: Coordination): boolean {
+    const { x, y } = point;
+    if (x <= 0 || x > this.state.gameSettings.mineAreaSize.width) {
+      console.log(`Coordinate ${point} x is invalid`);
+      return false;
+    }
+    if (y <= 0 || y > this.state.gameSettings.mineAreaSize.height) {
+      console.log(`Coordinate ${point} y is invalid`);
+      return true;
+    }
+    return true;
+  }
+
+  private getArea(areaArray: Area[][], point: Coordination): Area {
+    const { x, y } = point;
+    if (!this.checkPointValid(point)) {
+      throw new Error(`point ${point} is invalid`);
+    }
+    return areaArray[y - 1][x - 1];
+  }
+
   private showWarning = (text: string) => {
     alert(text);
   }
 
-
   private createEmptyArea = () => {
     return {
       isBomb: false,
+      surrounding: 0,
       state: EnumAreaState.NOT_OPEN
     };
   }
@@ -185,31 +219,50 @@ export default class MineSweeperController extends React.Component<any, State> {
     const areaArray = new Array<Area[]>(height);
     for (let column = 0; column < areaArray.length; column++) {
       areaArray[column] = new Array(width);
-      areaArray[column].fill(this.createEmptyArea());
+      for (let row = 0; row < width; ++row) {
+        areaArray[column][row] = this.createEmptyArea();
+      }
     }
 
     return areaArray;
   }
 
+  /**
+   * Create mine-filled area array.
+   *
+   * How much mines suurrounding also provided.
+   */
   private createFilledMineAreaArray = (state: Readonly<State>, clicked: Coordination) => {
 
     const { height, width } = state.gameSettings.mineAreaSize;
 
     const areaArray = this.createMineAreaArray(state);
-    areaArray[clicked.y - 1][clicked.x - 1].isBomb = true;
+    const index1 = clicked.y - 1;
+    const index2 = clicked.x - 1;
+    areaArray[index1][index2].isBomb = true;
 
     let tmpMineCount = state.gameSettings.mineCount;
-    while (tmpMineCount--) {
-      let index1: number;
-      let index2: number;
+    while (tmpMineCount > 0) {
+      tmpMineCount = tmpMineCount - 1;
+      let i1: number;
+      let i2: number;
       do {
-        index1 = Math.round(Math.random() * height);
-        index2 = Math.round(Math.random() * width);
-      } while (areaArray[index1][index2].isBomb);
-      areaArray[index1][index2].isBomb = true;
+        i1 = Math.round(Math.random() * (height - 1));
+        i2 = Math.round(Math.random() * (width - 1));
+      } while (areaArray[i1][i2].isBomb);
+
+      areaArray[i1][i2].isBomb = true;
+      safeDoubleGet(areaArray, i1 - 1, i2 - 1).ifPresent(area => area.surrounding += 1);
+      safeDoubleGet(areaArray, i1 - 1, i2    ).ifPresent(area => area.surrounding += 1);
+      safeDoubleGet(areaArray, i1 - 1, i2 + 1).ifPresent(area => area.surrounding += 1);
+      safeDoubleGet(areaArray, i1 + 1, i2 - 1).ifPresent(area => area.surrounding += 1);
+      safeDoubleGet(areaArray, i1 + 1, i2    ).ifPresent(area => area.surrounding += 1);
+      safeDoubleGet(areaArray, i1 + 1, i2 + 1).ifPresent(area => area.surrounding += 1);
+      safeDoubleGet(areaArray, i1, i2 - 1).ifPresent(area => area.surrounding += 1);
+      safeDoubleGet(areaArray, i1, i2 + 1).ifPresent(area => area.surrounding += 1);
     }
 
-    areaArray[clicked.y][clicked.x].isBomb = false;
+    areaArray[index1][index2].isBomb = false;
     return areaArray;
   }
 }

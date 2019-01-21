@@ -17,6 +17,11 @@ export interface Optional<T> {
   isPresent(): boolean;
 
   /**
+   * Run if value present
+   */
+  ifPresent(consumer: (obj: T) => any): Optional<T>;
+
+  /**
    * If the value not present, return other value, else this value
    *
    * @param other Other value
@@ -54,6 +59,10 @@ class None<T> implements Optional<T> {
     return true;
   }
 
+  public ifPresent(consumer: (obj: T) => any): Optional<T> {
+    return this;
+  }
+
   public orElse(other: T): T {
     return other;
   }
@@ -72,7 +81,6 @@ class None<T> implements Optional<T> {
 }
 
 class Some<T> implements Optional<T> {
-
   private obj: T;
 
   constructor(obj: T) {
@@ -86,6 +94,11 @@ class Some<T> implements Optional<T> {
 
   public isPresent(): boolean {
     return true;
+  }
+
+  public ifPresent(consumer: (obj: T) => any): Optional<T> {
+    consumer(this.obj);
+    return this;
   }
 
   public orElse(other: T): T {
@@ -119,4 +132,11 @@ export function of<X>(value: X | undefined | null): Optional<X> {
   } else {
     return new Some(value);
   }
+}
+
+/**
+ * Create an Empty optional object
+ */
+export function empty<X>(): Optional<X> {
+  return new None();
 }
