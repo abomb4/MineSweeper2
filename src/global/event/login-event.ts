@@ -2,7 +2,7 @@
  * 定义登录相关消息，及其创建方法
  */
 
-import { PayloadAction } from 'typesafe-actions/dist/types';
+import { PayloadAction } from 'typesafe-actions/dist/type-helpers';
 
 /**
  * 事件类型
