@@ -22,7 +22,7 @@ interface State {
   gameStatus: EnumGameStatus;
 
   /** Current mine area info */
-  mineArea?: Area[][];
+  mineArea: Area[][];
 
   /** The area was not inited before first clicked */
   areaInited: boolean;
@@ -41,7 +41,6 @@ export default class MineSweeperController extends React.Component<any, State> {
 
   constructor(props: void) {
     super(props);
-    this.createMineAreaArray.bind(this);
     this.state = {
       gameSettings: {
         mineAreaSize: {
@@ -52,7 +51,8 @@ export default class MineSweeperController extends React.Component<any, State> {
       },
       gameStatus: EnumGameStatus.MAIN_MENU,
       totalFlags: 0,
-      areaInited: false
+      areaInited: false,
+      mineArea: []
     };
   }
 
@@ -72,7 +72,9 @@ export default class MineSweeperController extends React.Component<any, State> {
   }
 
   // =-=-=-=-=-=-=-=-=-=- Event Bindings -=-=-=-=-=-=-=-=-=-=-=
-  // Events on main menu
+  // =-=-=-=-=-=- Events on main menu -=-=-=-=-=-=
+
+  /** Called when Area Width changed */
   private onAreaWidthChanged: (value: number) => any = (value: number) => {
     if (value >= MIN_AREA_WIDTH) {
       const gameSettings = Object.assign({}, this.state.gameSettings);
@@ -82,6 +84,8 @@ export default class MineSweeperController extends React.Component<any, State> {
       });
     }
   }
+
+  /** Called when Area height changed */
   private onAreaHeightChanged: (value: number) => any = (value: number) => {
     if (value >= MIN_AREA_HEIGHT) {
       const gameSettings = Object.assign({}, this.state.gameSettings);
@@ -91,6 +95,7 @@ export default class MineSweeperController extends React.Component<any, State> {
       });
     }
   }
+  /** Called when Area mine count changed */
   private onMineCountChanged: (value: number) => any = (value: number) => {
     if (value >= MIN_MINE_COUNT) {
       const gameSettings = Object.assign({}, this.state.gameSettings);
@@ -101,6 +106,7 @@ export default class MineSweeperController extends React.Component<any, State> {
     }
   }
 
+  /** Called on game start */
   private onGameStart: () => any = () => {
     // Check game settings
     const gameSettings = this.state.gameSettings;
@@ -119,29 +125,32 @@ export default class MineSweeperController extends React.Component<any, State> {
     });
   }
 
-  // Events on game over
+  // =-=-=-=-=-=- Events on game over -=-=-=-=-=-=
+  /** Restart the game immediately, clear every state */
   private onRestartImmediately: () => any = () => {
     this.onGameStart();
   }
 
+  /** Back to main menu */
   private onReturn: () => any = () => {
     this.setState({
       gameStatus: EnumGameStatus.MAIN_MENU,
       gameStartTime: undefined,
       totalFlags: 0,
-      mineArea: undefined
+      mineArea: []
     });
   }
 
-  // Events during game
-  private onAreaClicked: (point: Coordination) => any = (point: Coordination) => {
+  // =-=-=-=-=-=- Events during game -=-=-=-=-=-=
+  /** Area clicked */
+  private onAreaClicked: (point: Coordination) => void = (point: Coordination) => {
     if (!this.checkPointValid(point)) {
       return;
     }
     let areaArray: Area[][] = Object.assign([], this.state.mineArea);
 
     // If flagged or opened, do nothing
-    switch (this.getArea(areaArray, point).state) {
+    switch (this.getAreaElement(areaArray, point).state) {
       case EnumAreaState.FLAGGED:
       case EnumAreaState.OPEN:
         return;
@@ -151,17 +160,36 @@ export default class MineSweeperController extends React.Component<any, State> {
     // Init first
     if (!this.state.areaInited) {
       areaArray = this.createFilledMineAreaArray(this.state, point);
-      this.getArea(areaArray, point).state = EnumAreaState.OPEN;
+      this.getAreaElement(areaArray, point).state = EnumAreaState.OPEN;
       this.setState({
         areaInited: true,
         mineArea: areaArray
       });
+      return;
     }
 
     // Active
+    const areaPoint = this.getAreaElement(areaArray, point);
+    areaPoint.state = EnumAreaState.OPEN;
+    if (areaPoint.isBomb) {
+      this.setState({
+        gameStatus: EnumGameStatus.GAME_OVER_FAILED,
+        mineArea: areaArray
+      });
+    } else {
+      // TODO Check we won
 
+      const surrondingCount = areaPoint.surrounding;
+      if (surrondingCount === 0) {
+        // TODO Click surrounded areas
+      }
+      this.setState({
+        mineArea: areaArray
+      });
+    }
   }
 
+  /** Area right clicked */
   private onAreaRightClicked: (point: Coordination) => any = (point: Coordination) => {
     if (!this.checkPointValid(point)) {
       return;
@@ -169,7 +197,7 @@ export default class MineSweeperController extends React.Component<any, State> {
     const { x, y } = point;
   }
 
-  // =-=-=-=-=-=-=-=-=-=-=- Functions -=-=-=-=-=-=-=-=-=-=-=-=
+  // =-=-=-=-=-=-=-=-=-=-=- Private Functions -=-=-=-=-=-=-=-=-=-=-=-=
   private checkPointValid(point: Coordination): boolean {
     const { x, y } = point;
     if (x <= 0 || x > this.state.gameSettings.mineAreaSize.width) {
@@ -183,7 +211,13 @@ export default class MineSweeperController extends React.Component<any, State> {
     return true;
   }
 
-  private getArea(areaArray: Area[][], point: Coordination): Area {
+  /**
+   * Get specific area element by coordination
+   *
+   * @param areaArray Area array
+   * @param point     The coordination of point, x and y starts with 1
+   */
+  private getAreaElement(areaArray: Area[][], point: Coordination): Area {
     const { x, y } = point;
     if (!this.checkPointValid(point)) {
       throw new Error(`point ${point} is invalid`);

@@ -8,6 +8,7 @@ interface AreaProps {
   columnIndex: number;
   areaData: Area;
   onAreaClicked: (point: Coordination) => any;
+  onAreaRightClicked: (point: Coordination) => any;
 }
 
 class AreaComponent extends React.Component<AreaProps> {
@@ -22,7 +23,7 @@ class AreaComponent extends React.Component<AreaProps> {
       'not-opened': EnumAreaState.NOT_OPEN === data.state,
     });
     return (
-    <span className={cls} onClick={this.handleClick}>
+    <span className={cls} onClick={this.handleClick} onContextMenu={this.handleRightClick}>
       { !data.isBomb && data.state === EnumAreaState.OPEN && data.surrounding > 0 ? data.surrounding : undefined }
     </span>
     );
@@ -30,6 +31,10 @@ class AreaComponent extends React.Component<AreaProps> {
 
   private handleClick = () => {
     this.props.onAreaClicked({ x: this.props.columnIndex + 1, y: this.props.rowIndex + 1 });
+  }
+  private handleRightClick = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
+    e.preventDefault();
+    this.props.onAreaRightClicked({ x: this.props.columnIndex + 1, y: this.props.rowIndex + 1 });
   }
 }
 
@@ -42,6 +47,7 @@ interface GameStartedProps {
   mineArea?: Area[][];
 
   onAreaClicked: (point: Coordination) => any;
+  onAreaRightClicked: (point: Coordination) => any;
   onAreaWidthChanged: (value: number) => any;
   onAreaHeightChanged: (value: number) => any;
   onMineCountChanged: (value: number) => any;
@@ -79,7 +85,13 @@ export default class GameStarted extends React.Component<GameStartedProps> {
             mineArea.map((rowArray, rowIndex) => {
               const columns = rowArray.map((area, columnIndex) => (
                 <div className="ms-area-column" key={`ms_area_row_${rowIndex}_col_${columnIndex}`}>
-                  {<AreaComponent areaData={area} rowIndex={rowIndex} columnIndex={columnIndex} onAreaClicked={this.props.onAreaClicked} />}
+                  {<AreaComponent
+                    areaData={area}
+                    rowIndex={rowIndex}
+                    columnIndex={columnIndex}
+                    onAreaClicked={this.props.onAreaClicked}
+                    onAreaRightClicked={this.props.onAreaRightClicked}
+                  />}
                 </div>
               ));
               return (<div className="ms-area-row" key={'ms_area_row_' + rowIndex}>{columns}</div>);

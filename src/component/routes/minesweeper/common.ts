@@ -1,3 +1,4 @@
+import { Optional } from '../../../utils/optional';
 
 /**
  * Defines all game status
@@ -28,9 +29,23 @@ export interface Settings {
   mineCount: number;
 }
 
+/**
+ * Coordination interface, x and y starts with 1, not 0
+ */
 export interface Coordination {
   x: number;
   y: number;
+}
+
+export class IntegerCoordination implements Coordination {
+  public x: number;
+  public y: number;
+
+  constructor(x: number, y: number) {
+    this.x = x;
+    this.y = y;
+  }
+
 }
 
 /** State of an area */
